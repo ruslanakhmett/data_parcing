@@ -11,13 +11,12 @@ def get_html(url):
 
 
 def write_csv(data):
-    with open('cmc.csv', 'a') as f:
+    with open('cmc.csv', 'a', encoding='utf-8') as f: 
         writer = csv.writer(f)
-    
-    writer.writerow([data['name'],
-                     data['label'],
-                     data['url'],
-                     data['price']])
+
+        writer.writerow((data['name'],
+                         data['volume'],
+                         data['url']))
 
 
 def get_page_data(html):
@@ -25,23 +24,22 @@ def get_page_data(html):
     trs = soup.find('table').find('tbody').find_all('tr')
     
     for tr in trs:
-        tds = tr.find_all('a', class_='cmc-link')
-        ps = tds[0].find_all('p')
+        tds1 = tr.find_all('a', class_='cmc-link')
+        ps = tds1[0].find_all('p')
         name = ps[0].get_text()
-        label = ps[1].get_text()
-        url = 'https://coinmarketcap.com' + tr.find('a').get('href')
-        price = tds[2].find('p').get_text() 
-        
+        url = 'https://coinmarketcap.com' + tr.find('a', class_='cmc-link').get('href')
+        volume = tds1[1].find('p').get_text()
         data = {'name': name,
-                'label': label,
+                'volume': volume,
                 'url': url,
-                'price': price}
+                }
         
         write_csv(data)
-
+        
+        
 
 def main():
-    url = 'https://coinmarketcap.com/'
+    url = 'https://coinmarketcap.com/ru/rankings/exchanges/'
     get_page_data(get_html(url))
 
 
